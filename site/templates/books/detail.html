@@ -1,0 +1,127 @@
+
+{% extends "base/base.html" %}
+{% block content %}	
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/">
+        <!--<img alt="Brand" src="...">-->
+		<span class="glyphicon glyphicon-book" aria-hidden="true"></span>
+      </a>
+    </div>
+
+	<ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Signed in as {{user.username}}<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="/users/logout/">Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+  </div>
+</nav>
+
+<div class="container">
+	<div class='row'>
+		<div class="col-md-3">
+			<img src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcSwCkj4bXjVe4XFaRVfX-HPRmispB4BaRSSz-r5NAj_sTfkxcwR"/>
+		</div>
+        <div class="col-md-9">
+				<div class="panel panel-default">
+				  <div class="panel-heading">
+							<h1>{{book.title}}</h1>
+							<div>by&nbsp<span class='h3' style='color:green;'>{{book.author}}</span></div>
+				  </div>
+				  <div class="panel-body">
+						{% if book.publisher != '' %}
+							<div><span class='h4'><b>Publisher:</b></span>&nbsp&nbsp{{book.publisher}}</div>
+						{% endif %}
+						{% if book.genre != '' %}
+							<div><span class='h4'><b>Genre:</b></span>&nbsp&nbsp{{book.genre}}</div>
+						{% endif %}
+						{% if book.pub_date != None %}
+							<div><span class='h4'><b>Published Date:</b></span>&nbsp&nbsp{{book.pub_date}}</div>
+						{% endif %}
+						{% if book.ISBN != '' %}
+							<div><span class='h4'><b>ISBN:</b></span>&nbsp&nbsp{{book.ISBN}}</div>
+						{% endif %}
+						{% if book.description != '' %}
+							<h3>Description:</h3>
+							<p>{{book.description}}</p>
+						{% endif %}
+				  </div>
+				</div>
+		</div>
+	</div>
+</div>
+<div class="panel panel-info" style='margin:20px;'>
+		<div class="panel-heading reviews panel-title h2">
+			Reviews
+			<span style='float:right'>
+				<button type='button' class="btn btn-primary btn-xs" onclick='open_reviewbox();'>
+					<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbspAdd Review
+				</button>
+			</span>
+		</div>
+		<div class="panel-body reviews_panel">
+				{% for r in book.review_set.all %}
+		<div class='review bs-callout bs-callout-info'>
+			<h4>{{r.user.username}}</h4><p>{{r.text}}</p>
+		</div>
+				{% endfor %}
+		</div>
+</div>
+
+<div class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add Review</h4>
+      </div>
+      <div class="modal-body">
+		<textarea rows='4' cols='50' placeholder='Add a comment...' name='comment' id='comment'></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick='add_review();'>Save</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<script>
+function open_reviewbox(){
+	$(".modal").modal('show');
+}
+
+function add_review(){
+	c =  $("#comment").val();
+	$.post('/books/add_review/',
+			{
+				'comment':c,
+				'book_id':{{book.id}},
+				'csrfmiddlewaretoken':'{{csrf_token}}'
+			},
+			function(data){
+				// if success, show latest review in the DOM
+				$(".modal").modal('hide');
+				$(".reviews_panel").append("<div class='review bs-callout bs-callout-info'><h4>{{user.username}}</h4><p>" + c + "</p></div>");
+				$("#comment")[0].value = '';
+
+			});
+}
+
+</script>
+
+<style>
+	.review{
+		margin-left:3%;
+	}
+</style>
+
+
+{% endblock %}
+
+
