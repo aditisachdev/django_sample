@@ -1,0 +1,17 @@
+Usage:
+* Create database using "python manage.py migrate"
+* Use admin site to create new users 
+
+
+Project Details:
+Entities:
+  - Book:
+  - Review
+
+Features
+- Login
+- Homepage: Book list (logged in users only)
+  - Add book
+- Book details
+  - Read/Browse comments
+  - Add comments
